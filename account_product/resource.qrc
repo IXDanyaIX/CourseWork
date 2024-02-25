@@ -1,0 +1,12 @@
+<RCC>
+    <qresource prefix="/resource">
+        <file>image/enter.png</file>
+        <file>image/free-icon-add-4239136.png</file>
+        <file>image/free-icon-delete-5610967.png</file>
+        <file>image/free-icon-add-button-5974633.png</file>
+        <file>image/free-icon-tab-7588946.png</file>
+    </qresource>
+    <qresource prefix="/">
+        <file>image/free-icon-tab-7588946.png</file>
+    </qresource>
+</RCC>
