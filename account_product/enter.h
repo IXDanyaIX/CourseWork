@@ -14,7 +14,7 @@ class Enter : public QDialog
     Q_OBJECT
 
 public:
-    explicit Enter(QWidget *parent = nullptr);
+    explicit Enter(User &user, QWidget *parent = nullptr);
     ~Enter();
 
 private slots:
@@ -24,7 +24,8 @@ private slots:
 
 private:
     Ui::Enter *ui;
-    Database db;
+    //Database db;
+    User* user;
 
 signals:
     void loginSuccess(const User& user);

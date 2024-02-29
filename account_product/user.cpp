@@ -79,12 +79,6 @@ bool User::isUserRegistered(User& user, QString name, QString password){
     query.bindValue(":password", password);
 
 
-
-
-
-
-
-
     if (query.exec() && query.next()) {
         // Если есть совпадение логина и пароля
         loginSuccessful = true;

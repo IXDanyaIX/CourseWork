@@ -2,9 +2,92 @@
 #include "ui_mainwindow.h"
 #include <QStyledItemDelegate>
 #include <QInputDialog>
-#include <QTimer>
-#include <QTreeView>
+#include <QSqlRelationalDelegate>
 #include <QHeaderView>
+#include <QDateEdit>
+
+
+
+
+class ComboBoxDelegate : public QStyledItemDelegate {
+public:
+    ComboBoxDelegate(QObject *parent = nullptr) : QStyledItemDelegate(parent) {}
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override {
+        if (index.column() == 0) { // Проверяем, что мы находимся в столбце "ID заказа"
+            QComboBox *comboBox = new QComboBox(parent);
+            // Загружаем список существующих заказов
+            QSqlQueryModel *ordersModel = new QSqlQueryModel(comboBox);
+            ordersModel->setQuery("SELECT id FROM orders", QSqlDatabase::database());
+            comboBox->setModel(ordersModel);
+            return comboBox;
+        } else {
+            return QStyledItemDelegate::createEditor(parent, option, index);
+        }
+    }
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override {
+        if (QComboBox *comboBox = qobject_cast<QComboBox*>(editor)) {
+            comboBox->setCurrentText(index.data().toString());
+        } else {
+            QStyledItemDelegate::setEditorData(editor, index);
+        }
+    }
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override {
+        if (QComboBox *comboBox = qobject_cast<QComboBox*>(editor)) {
+            model->setData(index, comboBox->currentText(), Qt::EditRole);
+        } else {
+            QStyledItemDelegate::setModelData(editor, model, index);
+        }
+    }
+};
+
+
+class QDateEditDelegate : public QStyledItemDelegate
+{
+public:
+    QDateEditDelegate(int column, QObject *parent = nullptr)
+        : QStyledItemDelegate(parent), dateColumn(column) {}
+
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override
+    {
+        if (index.column() == dateColumn) { // Проверяем, что мы находимся в нужном столбце
+            QDateEdit *editor = new QDateEdit(QDate::currentDate(), parent); // Установка текущей даты
+            editor->setMaximumDate(QDate::currentDate());
+            return editor;
+        } else {
+            return QStyledItemDelegate::createEditor(parent, option, index);
+        }
+    }
+
+    void setEditorData(QWidget *editor, const QModelIndex &index) const override
+    {
+        if (index.column() == dateColumn) {
+            QDate value = index.model()->data(index, Qt::EditRole).toDate();
+            QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
+            if (dateEdit)
+                dateEdit->setDate(value);
+        } else {
+            QStyledItemDelegate::setEditorData(editor, index);
+        }
+    }
+
+    void setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const override
+    {
+        if (index.column() == dateColumn) {
+            QDateEdit *dateEdit = qobject_cast<QDateEdit *>(editor);
+            if (dateEdit)
+                model->setData(index, dateEdit->date(), Qt::EditRole);
+        } else {
+            QStyledItemDelegate::setModelData(editor, model, index);
+        }
+    }
+
+private:
+    int dateColumn; // Индекс столбца с датой
+};
+
 
 class OrderDelegate : public QStyledItemDelegate {
 public:
@@ -65,6 +148,7 @@ MainWindow::MainWindow(QWidget *parent)
 //       ui->menubar->setCornerWidget(loginWidget);
 
 
+    inf_goods_form = new information_goods(this);
 
     ui->menubar->addSeparator(); // Добавляем разделитель
 
@@ -74,6 +158,9 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->toolBar->hide();
 
     connect(enter, &Enter::loginSuccess, this, &MainWindow::get_users_from_enter);
+
+
+
     //ui->action->setVisible(false)
     //QHeaderView *header = ui->tableData->horizontalHeader();
             // Устанавливаем режим изменения размеров секций на Stretch
@@ -118,8 +205,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     tabsLayout->addWidget(addTabButton);
     connect(addTabButton, &QPushButton::clicked, this, &MainWindow::addNewTab);
+    on_contractors_triggered();
+
+
 }
 
+void MainWindow::onClicked(const QModelIndex &index){
+    currentRow = index.row();
+}
 
 
 void MainWindow::addNewTab()
@@ -158,7 +251,7 @@ MainWindow::~MainWindow()
 
 void MainWindow::on_enter_button_clicked()
 {
-    enter = new Enter(this);
+    enter = new Enter(user);
     enter->setModal(true);
     enter->exec();
 }
@@ -171,9 +264,9 @@ void MainWindow::on_category_triggered()
     QTableView *table = create_table();
 
     table->setModel(category.read_from_db());
-
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
@@ -184,16 +277,19 @@ void MainWindow::on_contractors_triggered()
     table->setModel(actors.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
 void MainWindow::on_Users_triggered()
 {
-    User users;
+
     QTableView *table = create_table();
-    table->setModel(users.read_from_db());
+    table->setModel(user.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    table->setItemDelegate(new QSqlRelationalDelegate(table));
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
@@ -204,6 +300,7 @@ void MainWindow::on_units_of_measurement_triggered()
     table->setModel(units.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
@@ -213,10 +310,16 @@ void MainWindow::on_goods_triggered()
     QTableView *table = create_table();
     QSqlTableModel* model = goods.read_from_db();
 
-    model->removeColumn(6);
-    model->removeColumn(6);
-    model->removeColumn(6);
-    model->removeColumn(6);
+
+    inf_goods_form->setModel(model); // для более подробной информации связываем модель.
+
+
+
+
+//    model->removeColumn(6);
+//    model->removeColumn(6);
+//    model->removeColumn(6);
+//    model->removeColumn(6);
 
     model->setHeaderData(0, Qt::Horizontal, "Артикул");
     model->setHeaderData(1, Qt::Horizontal, "Контрагенты");
@@ -233,25 +336,38 @@ void MainWindow::on_goods_triggered()
 
     table->setModel(model);
 
+    table->hideColumn(6);
+    table->hideColumn(7);
+    table->hideColumn(8);
+    table->hideColumn(9);
+
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
-    table->horizontalHeader()->swapSections(1, 5);
-    table->horizontalHeader()->swapSections(4, 5);
+//    table->horizontalHeader()->swapSections(1, 5);
+//    table->horizontalHeader()->swapSections(4, 5);
 
     table->horizontalHeader()->setSectionsMovable(true);
 
-    OrderDelegate* deleg = new OrderDelegate(this);
-    deleg->is_set_under_line =true;
-    deleg->textColor = Qt::blue;
-    table->setItemDelegateForColumn(0, deleg);
+//    OrderDelegate* deleg = new OrderDelegate(this);
+//    deleg->is_set_under_line =true;
+//    deleg->textColor = Qt::blue;
+//    table->setItemDelegateForColumn(0, deleg);
 
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
+
+
+    table->setItemDelegate(new QSqlRelationalDelegate(table));
 
 
 
-    connect(table, &QTableView::clicked, this, &MainWindow::onGoodsClicked);
+    connect(table, &QTableView::doubleClicked, this, &MainWindow::onGoodsClicked);
 }
 
 void MainWindow::onGoodsClicked(const QModelIndex &index) {
+    //inf_goods_form->setParent(this, Qt::Window);
+    inf_goods_form->mapper->setCurrentModelIndex(index);
+    inf_goods_form->show();
+    //inf_goods_form->mapper->toFirst();
 }
 
 
@@ -263,6 +379,8 @@ void MainWindow::on_status_goods_triggered()
     table->setModel(status.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
+
 }
 
 
@@ -273,6 +391,7 @@ void MainWindow::on_status_order_triggered()
     table->setModel(order.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
@@ -283,6 +402,7 @@ void MainWindow::on_Rights_triggered()
     table->setModel(rights.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
@@ -293,16 +413,34 @@ void MainWindow::on_Role_triggered()
     table->setModel(role.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
+    table->setItemDelegate(new QSqlRelationalDelegate(table));
 }
 
 
 void MainWindow::on_shipment_triggered()
 {
+
+
     Shipment sipm;
     QTableView* table = create_table();
     table->setModel(sipm.read_from_db());
     table->setItemDelegateForColumn(0, new OrderDelegate(this));
+    // Предположим, что ваш `QTableView` называется `tableView`
+
+
+    int dateColumn = 1; // Предположим, что столбец с датой имеет индекс 2
+    QDateEditDelegate *delegate = new QDateEditDelegate(dateColumn, this);
+    table->setItemDelegateForColumn(dateColumn, delegate);
+
+
+    ComboBoxDelegate *delegateе = new ComboBoxDelegate(this);
+    table->setItemDelegateForColumn(0, delegateе); // Предполагается, что столбец "ID заказа" имеет индекс 0
+
+
+
     table_data = table;
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 }
 
 
@@ -310,17 +448,28 @@ void MainWindow::on_orders_triggered()
 {
     Orders order;
     QTableView* table = create_table();
-    table->setModel(order.read_from_db());
+    QSqlTableModel* model = order.read_from_db();
+
+
+    model->setHeaderData(0, Qt::Horizontal, "Номер заказа");
+    model->setHeaderData(1, Qt::Horizontal, "Дата заказа");
+    model->setHeaderData(2, Qt::Horizontal, "Статус заказа");
+
+
+    table->setModel(model);
+
+
 
     OrderDelegate* deleg = new OrderDelegate(this);
     deleg->is_set_under_line =true;
     deleg->textColor = Qt::blue;
     table->setItemDelegateForColumn(0, deleg);
+    table->setItemDelegate(new QSqlRelationalDelegate(table));
 
     table_data = table;
 
 
-
+    connect(table_data, &QTableView::clicked, this, &MainWindow::onClicked);
 
     connect(table, &QTableView::clicked, this, &MainWindow::onOrderClicked);
 }
@@ -334,7 +483,16 @@ void MainWindow::onOrderClicked(const QModelIndex &index) {
 
             // Создаем и настраиваем QTableView для отображения данных
             QTableView* tableData = new QTableView;
-            tableData->setModel(order.get_goods_from_order(orderId));
+
+            QSqlTableModel* model = order.get_goods_from_order(orderId);
+
+
+            model->setHeaderData(1, Qt::Horizontal, "Название товара");
+            model->setHeaderData(2, Qt::Horizontal, "Количество");
+
+            tableData->setModel(model);
+
+            tableData->hideColumn(1);
 
             // Создаем новую вкладку
             QWidget* newTab = new_tab();
@@ -349,15 +507,15 @@ void MainWindow::onOrderClicked(const QModelIndex &index) {
             tableData->setFont(font);
 
 
+            tableData->setItemDelegate(new QSqlRelationalDelegate(tableData));
+
+
 
             QHeaderView *header = tableData->horizontalHeader();
             // Устанавливаем режим изменения размеров секций на Stretch
             header->setSectionResizeMode(QHeaderView::Stretch);
+            table_data = tableData;
         }
-
-
-
-
     }
 }
 
@@ -377,8 +535,6 @@ void MainWindow::on_tabWidget_tabCloseRequested(int index)
         ui->tabWidget->setTabsClosable(false);
     }
 }
-
-
 
 
 
@@ -440,7 +596,7 @@ QTableView* MainWindow::create_table(){
     // Устанавливаем режим изменения размеров секций на Stretch
     QHeaderView *header = tableData->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Stretch);
-
+    tableData->setSortingEnabled(true);
     return tableData;
 }
 
@@ -452,5 +608,28 @@ void MainWindow::on_tabWidget_currentChanged(int index)
     if (currentTab) {
         table_data = currentTab->findChild<QTableView *>();
     }
+}
+
+
+void MainWindow::on_action_triggered()
+{
+    absmodel = table_data->model();
+    model = qobject_cast<QSqlTableModel *>(absmodel);
+    if (model) {
+        model->insertRow(model->rowCount());
+    }
+
+}
+
+
+void MainWindow::on_action_2_triggered()
+{
+    absmodel = table_data->model();
+    model = qobject_cast<QSqlTableModel *>(absmodel);
+    if (model) {
+        model->removeRow(currentRow);
+        model->select();
+    }
+
 }
 

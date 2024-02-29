@@ -21,8 +21,9 @@ QSqlTableModel* Orders::read_from_db() const{
     QSqlRelationalTableModel* model = new QSqlRelationalTableModel;
     model->setTable("orders");
     model->setRelation(2, QSqlRelation("status_order", "id", "name"));
+
     model->select();
-    model->setEditStrategy(QSqlTableModel::OnRowChange);
+    //model->setEditStrategy(QSqlTableModel::OnRowChange);
 
 
     model->setHeaderData(0, Qt::Horizontal, "Номер заказа");
@@ -39,10 +40,9 @@ QSqlTableModel* Orders::get_goods_from_order(int index){
     model->setFilter("id_orders = " + QString::number(index));
     model->setRelation(0, QSqlRelation("goods", "id", "name"));
     model->select();
-    model->removeColumn(1);
 
-    model->setHeaderData(0, Qt::Horizontal, "Название товара");
-    model->setHeaderData(1, Qt::Horizontal, "Количество");
+
+
     return model;
 }
 

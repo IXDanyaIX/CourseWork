@@ -16,6 +16,7 @@ SOURCES += \
     goods.cpp \
     iadd.cpp \
     idelete.cpp \
+    information_goods.cpp \
     iread.cpp \
     iremove.cpp \
     main.cpp \
@@ -37,6 +38,7 @@ HEADERS += \
     goods.h \
     iadd.h \
     idelete.h \
+    information_goods.h \
     iread.h \
     iremove.h \
     mainwindow.h \
@@ -51,6 +53,7 @@ HEADERS += \
 
 FORMS += \
     enter.ui \
+    information_goods.ui \
     mainwindow.ui
 
 # Default rules for deployment.

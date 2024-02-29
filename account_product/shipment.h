@@ -14,6 +14,7 @@ public:
 
     void add_to_db() const override;
     void delete_from_db() const override;
+
     QSqlTableModel* read_from_db() const override;
 
 private:

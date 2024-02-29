@@ -59,6 +59,7 @@ SOURCES       = ../account_product/category.cpp \
 		../account_product/goods.cpp \
 		../account_product/iadd.cpp \
 		../account_product/idelete.cpp \
+		../account_product/information_goods.cpp \
 		../account_product/iread.cpp \
 		../account_product/iremove.cpp \
 		../account_product/main.cpp \
@@ -75,6 +76,7 @@ SOURCES       = ../account_product/category.cpp \
 		moc_enter.cpp \
 		moc_iadd.cpp \
 		moc_idelete.cpp \
+		moc_information_goods.cpp \
 		moc_iread.cpp \
 		moc_iremove.cpp \
 		moc_mainwindow.cpp
@@ -85,6 +87,7 @@ OBJECTS       = category.o \
 		goods.o \
 		iadd.o \
 		idelete.o \
+		information_goods.o \
 		iread.o \
 		iremove.o \
 		main.o \
@@ -102,6 +105,7 @@ OBJECTS       = category.o \
 		moc_enter.o \
 		moc_iadd.o \
 		moc_idelete.o \
+		moc_information_goods.o \
 		moc_iread.o \
 		moc_iremove.o \
 		moc_mainwindow.o
@@ -209,6 +213,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../account_product/goods.h \
 		../account_product/iadd.h \
 		../account_product/idelete.h \
+		../account_product/information_goods.h \
 		../account_product/iread.h \
 		../account_product/iremove.h \
 		../account_product/mainwindow.h \
@@ -226,6 +231,7 @@ DIST          = /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
 		../account_product/goods.cpp \
 		../account_product/iadd.cpp \
 		../account_product/idelete.cpp \
+		../account_product/information_goods.cpp \
 		../account_product/iread.cpp \
 		../account_product/iremove.cpp \
 		../account_product/main.cpp \
@@ -246,7 +252,7 @@ TARGET        = account_product
 first: all
 ####### Build rules
 
-account_product: ui_enter.h ui_mainwindow.h $(OBJECTS)  
+account_product: ui_enter.h ui_information_goods.h ui_mainwindow.h $(OBJECTS)  
 	$(LINK) $(LFLAGS) -o $(TARGET) $(OBJECTS) $(OBJCOMP) $(LIBS)
 
 Makefile: ../account_product/account_product.pro /usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++/qmake.conf /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/spec_pre.prf \
@@ -464,9 +470,9 @@ distdir: FORCE
 	$(COPY_FILE) --parents $(DIST) $(DISTDIR)/
 	$(COPY_FILE) --parents ../account_product/resource.qrc $(DISTDIR)/
 	$(COPY_FILE) --parents /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../account_product/category.h ../account_product/contractors.h ../account_product/database.h ../account_product/enter.h ../account_product/goods.h ../account_product/iadd.h ../account_product/idelete.h ../account_product/iread.h ../account_product/iremove.h ../account_product/mainwindow.h ../account_product/orders.h ../account_product/rigts.h ../account_product/role.h ../account_product/shipment.h ../account_product/status_good.h ../account_product/status_order.h ../account_product/units_of_measurement.h ../account_product/user.h $(DISTDIR)/
-	$(COPY_FILE) --parents ../account_product/category.cpp ../account_product/contractors.cpp ../account_product/database.cpp ../account_product/enter.cpp ../account_product/goods.cpp ../account_product/iadd.cpp ../account_product/idelete.cpp ../account_product/iread.cpp ../account_product/iremove.cpp ../account_product/main.cpp ../account_product/mainwindow.cpp ../account_product/orders.cpp ../account_product/rigts.cpp ../account_product/role.cpp ../account_product/shipment.cpp ../account_product/status_good.cpp ../account_product/status_order.cpp ../account_product/units_of_measurement.cpp ../account_product/user.cpp $(DISTDIR)/
-	$(COPY_FILE) --parents ../account_product/enter.ui ../account_product/mainwindow.ui $(DISTDIR)/
+	$(COPY_FILE) --parents ../account_product/category.h ../account_product/contractors.h ../account_product/database.h ../account_product/enter.h ../account_product/goods.h ../account_product/iadd.h ../account_product/idelete.h ../account_product/information_goods.h ../account_product/iread.h ../account_product/iremove.h ../account_product/mainwindow.h ../account_product/orders.h ../account_product/rigts.h ../account_product/role.h ../account_product/shipment.h ../account_product/status_good.h ../account_product/status_order.h ../account_product/units_of_measurement.h ../account_product/user.h $(DISTDIR)/
+	$(COPY_FILE) --parents ../account_product/category.cpp ../account_product/contractors.cpp ../account_product/database.cpp ../account_product/enter.cpp ../account_product/goods.cpp ../account_product/iadd.cpp ../account_product/idelete.cpp ../account_product/information_goods.cpp ../account_product/iread.cpp ../account_product/iremove.cpp ../account_product/main.cpp ../account_product/mainwindow.cpp ../account_product/orders.cpp ../account_product/rigts.cpp ../account_product/role.cpp ../account_product/shipment.cpp ../account_product/status_good.cpp ../account_product/status_order.cpp ../account_product/units_of_measurement.cpp ../account_product/user.cpp $(DISTDIR)/
+	$(COPY_FILE) --parents ../account_product/enter.ui ../account_product/information_goods.ui ../account_product/mainwindow.ui $(DISTDIR)/
 
 
 clean: compiler_clean 
@@ -509,9 +515,9 @@ compiler_moc_predefs_clean:
 moc_predefs.h: /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 	g++ -pipe -g -std=gnu++11 -Wall -Wextra -dM -E -o moc_predefs.h /usr/lib/x86_64-linux-gnu/qt5/mkspecs/features/data/dummy.cpp
 
-compiler_moc_header_make_all: moc_database.cpp moc_enter.cpp moc_iadd.cpp moc_idelete.cpp moc_iread.cpp moc_iremove.cpp moc_mainwindow.cpp
+compiler_moc_header_make_all: moc_database.cpp moc_enter.cpp moc_iadd.cpp moc_idelete.cpp moc_information_goods.cpp moc_iread.cpp moc_iremove.cpp moc_mainwindow.cpp
 compiler_moc_header_clean:
-	-$(DEL_FILE) moc_database.cpp moc_enter.cpp moc_iadd.cpp moc_idelete.cpp moc_iread.cpp moc_iremove.cpp moc_mainwindow.cpp
+	-$(DEL_FILE) moc_database.cpp moc_enter.cpp moc_iadd.cpp moc_idelete.cpp moc_information_goods.cpp moc_iread.cpp moc_iremove.cpp moc_mainwindow.cpp
 moc_database.cpp: ../account_product/database.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
@@ -537,6 +543,11 @@ moc_idelete.cpp: ../account_product/idelete.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/daniil/Documents/course_work/programm/product_accounting_system/build-account_product-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/daniil/Documents/course_work/programm/product_accounting_system/account_product -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../account_product/idelete.h -o moc_idelete.cpp
+
+moc_information_goods.cpp: ../account_product/information_goods.h \
+		moc_predefs.h \
+		/usr/lib/qt5/bin/moc
+	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/daniil/Documents/course_work/programm/product_accounting_system/build-account_product-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/daniil/Documents/course_work/programm/product_accounting_system/account_product -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../account_product/information_goods.h -o moc_information_goods.cpp
 
 moc_iread.cpp: ../account_product/iread.h \
 		moc_predefs.h \
@@ -565,6 +576,7 @@ moc_mainwindow.cpp: ../account_product/mainwindow.h \
 		../account_product/role.h \
 		../account_product/shipment.h \
 		../account_product/orders.h \
+		../account_product/goods.h \
 		moc_predefs.h \
 		/usr/lib/qt5/bin/moc
 	/usr/lib/qt5/bin/moc $(DEFINES) --include /home/daniil/Documents/course_work/programm/product_accounting_system/build-account_product-Desktop-Debug/moc_predefs.h -I/usr/lib/x86_64-linux-gnu/qt5/mkspecs/linux-g++ -I/home/daniil/Documents/course_work/programm/product_accounting_system/account_product -I/usr/include/x86_64-linux-gnu/qt5 -I/usr/include/x86_64-linux-gnu/qt5/QtWidgets -I/usr/include/x86_64-linux-gnu/qt5/QtGui -I/usr/include/x86_64-linux-gnu/qt5/QtSql -I/usr/include/x86_64-linux-gnu/qt5/QtCore -I. -I/usr/include/c++/11 -I/usr/include/x86_64-linux-gnu/c++/11 -I/usr/include/c++/11/backward -I/usr/lib/gcc/x86_64-linux-gnu/11/include -I/usr/local/include -I/usr/include/x86_64-linux-gnu -I/usr/include ../account_product/mainwindow.h -o moc_mainwindow.cpp
@@ -573,12 +585,16 @@ compiler_moc_objc_header_make_all:
 compiler_moc_objc_header_clean:
 compiler_moc_source_make_all:
 compiler_moc_source_clean:
-compiler_uic_make_all: ui_enter.h ui_mainwindow.h
+compiler_uic_make_all: ui_enter.h ui_information_goods.h ui_mainwindow.h
 compiler_uic_clean:
-	-$(DEL_FILE) ui_enter.h ui_mainwindow.h
+	-$(DEL_FILE) ui_enter.h ui_information_goods.h ui_mainwindow.h
 ui_enter.h: ../account_product/enter.ui \
 		/usr/lib/qt5/bin/uic
 	/usr/lib/qt5/bin/uic ../account_product/enter.ui -o ui_enter.h
+
+ui_information_goods.h: ../account_product/information_goods.ui \
+		/usr/lib/qt5/bin/uic
+	/usr/lib/qt5/bin/uic ../account_product/information_goods.ui -o ui_information_goods.h
 
 ui_mainwindow.h: ../account_product/mainwindow.ui \
 		/usr/lib/qt5/bin/uic
@@ -631,6 +647,10 @@ iadd.o: ../account_product/iadd.cpp ../account_product/iadd.h
 idelete.o: ../account_product/idelete.cpp ../account_product/idelete.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o idelete.o ../account_product/idelete.cpp
 
+information_goods.o: ../account_product/information_goods.cpp ../account_product/information_goods.h \
+		ui_information_goods.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o information_goods.o ../account_product/information_goods.cpp
+
 iread.o: ../account_product/iread.cpp ../account_product/iread.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o iread.o ../account_product/iread.cpp
 
@@ -653,7 +673,8 @@ main.o: ../account_product/main.cpp ../account_product/mainwindow.h \
 		../account_product/rigts.h \
 		../account_product/role.h \
 		../account_product/shipment.h \
-		../account_product/orders.h
+		../account_product/orders.h \
+		../account_product/goods.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../account_product/main.cpp
 
 mainwindow.o: ../account_product/mainwindow.cpp ../account_product/mainwindow.h \
@@ -673,6 +694,7 @@ mainwindow.o: ../account_product/mainwindow.cpp ../account_product/mainwindow.h 
 		../account_product/role.h \
 		../account_product/shipment.h \
 		../account_product/orders.h \
+		../account_product/goods.h \
 		ui_mainwindow.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o mainwindow.o ../account_product/mainwindow.cpp
 
@@ -740,6 +762,9 @@ moc_iadd.o: moc_iadd.cpp
 
 moc_idelete.o: moc_idelete.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_idelete.o moc_idelete.cpp
+
+moc_information_goods.o: moc_information_goods.cpp 
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_information_goods.o moc_information_goods.cpp
 
 moc_iread.o: moc_iread.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o moc_iread.o moc_iread.cpp

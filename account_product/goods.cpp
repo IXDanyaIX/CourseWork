@@ -21,7 +21,7 @@ QSqlTableModel* Goods::read_from_db() const{
 
 
     model->setRelation(1, QSqlRelation("contractors", "id", "name"));
-    model->setRelation(2, QSqlRelation("units_of_measurement", "id", "name"));
+    model->setRelation(2, QSqlRelation("units_of_measurement", "id", "designation"));
     model->setRelation(3, QSqlRelation("category", "id", "name"));
     model->setRelation(4, QSqlRelation("status_goods", "id", "name"));
     model->select();
@@ -32,3 +32,15 @@ QSqlTableModel* Goods::read_from_db() const{
     return model;
 }
 
+QSqlTableModel* Goods::get_goods(int index){
+    QSqlRelationalTableModel* model = new QSqlRelationalTableModel;
+    model->setTable("goods");
+    model->setFilter("id = " + QString::number(index));
+    model->setRelation(0, QSqlRelation("goods", "id", "name"));
+    model->select();
+    model->removeColumn(1);
+
+    model->setHeaderData(0, Qt::Horizontal, "Название товара");
+    model->setHeaderData(1, Qt::Horizontal, "Количество");
+    return model;
+}

@@ -19,8 +19,9 @@ void Shipment::delete_from_db() const{
 }
 
 QSqlTableModel* Shipment::read_from_db() const{
-    QSqlTableModel* model = new QSqlTableModel;
+    QSqlRelationalTableModel* model = new QSqlRelationalTableModel;
     model->setTable("shipment");
+    model->setRelation(0, QSqlRelation("orders", "id", "id"));
     model->select();
     model->setEditStrategy(QSqlTableModel::OnRowChange);
 

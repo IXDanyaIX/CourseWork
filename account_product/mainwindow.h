@@ -15,6 +15,7 @@
 #include "orders.h"
 #include "goods.h"
 #include <QPushButton>
+#include "information_goods.h"
 
 
 
@@ -72,8 +73,15 @@ private slots:
 
     void on_tabWidget_currentChanged(int index);
 
+    void on_action_triggered();
+
+    void onClicked(const QModelIndex&);
+
+    void on_action_2_triggered();
+
 private:
 
+    information_goods* inf_goods_form;
     QWidget * new_tab();
     void check_role();
     Ui::MainWindow *ui;
@@ -81,8 +89,10 @@ private:
     User user;
     QTableView *table_data;
     QPushButton *addTabButton;
-
+    QAbstractItemModel * absmodel;
+    QSqlTableModel *model;
     QTableView* create_table();
+    int currentRow;
 
 public slots:
     void get_users_from_enter(const User& user);
